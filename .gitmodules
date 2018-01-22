@@ -1,0 +1,3 @@
+[submodule "i3msg-python"]
+	path = i3msg-python
+	url = git@github.com:juliusHuelsmann/i3msg-python.git
