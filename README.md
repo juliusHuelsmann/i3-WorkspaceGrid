@@ -24,6 +24,8 @@ Forked from [https://github.com/lukeshimanuki/i3-grid](Luke Shimanuki).
 - observable time consumption for switching workspaces.
 - works as supposed, but might be a little bit confusing due to missing visual
   feedback. 
+- In case the workspaces are named, the naming is to be inserted into the
+  configuration of this script, too.
   
 #### TBD
 - write and read configuration  

@@ -65,17 +65,15 @@ class Grid:
         cw = self._getCurrentWorkspace()
         if (cw.shape[0]):
             ident, _ = cw[0]
-            print("ident", ident, _)
             cr, cc = coords = self._idToPos(int(ident)-1)
-            print("r, c", cr, cc)
 
 
 
             newc = cc + dc
             newr = cr + dr 
 
-            newcPos = (cc + dc) % self.cols
-            newrPos = newr
+            newcPos = newc % self.cols
+            newrPos = newr % self.rows
 
             while newcPos < 0:
                 newcPos += self.cols
