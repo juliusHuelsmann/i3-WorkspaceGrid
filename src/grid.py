@@ -16,7 +16,9 @@ class Grid:
         #self.titles = reload the titles
 
         #XXX: this sucks.
-        self.titles = np.array(["0", "1git", "2vim", "3ide", 4, 5, 6, "7qt", "8fire", "9chat"])
+        self.titles = np.array(["0", "1git", "2vim", "3ide", "4pdf", 
+            5, 6, "7qt", "8fire", "9chat"])
+
         self.cols = 3
         self.rows = 3
         self.reloadWorkspaces()
@@ -44,6 +46,15 @@ class Grid:
         pass
    
 
+    def _getExistingWorkspace(self, i):
+        """
+        Returns workspace at identifier.
+        :i:         identifier of the workspace.
+        If that workspace does not exist yet, create new workspace.
+        """
+        val = self._getWorkspaceByPredicate(lambda xs : xs["num"] == i)
+        if val.shape[0]:
+            return val[0]
 
     def _getWorkspace(self, i):
         """
@@ -51,7 +62,6 @@ class Grid:
         :i:         identifier of the workspace.
         If that workspace does not exist yet, create new workspace.
         """
-        print("i look for i ", i)
         val = self._getWorkspaceByPredicate(lambda xs : xs["num"] == i)
         if val.shape[0]:
             return val[0]
@@ -217,4 +227,7 @@ class GridInterface:
         self.gridController.moveWorkspaceBy(0, -1)
     def moveWorkspaceRight(self):
         self.gridController.moveWorkspaceBy(0, 1)
+
+    def reloadWorkspaces(self):
+        self.gridController.reloadWorkspaces()
 

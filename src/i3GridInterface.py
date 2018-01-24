@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from time import time
+st = time()
 import sys
 import os
 
@@ -21,6 +23,11 @@ if len(sys.argv) > 1:
         except:
             print("Command " + sys.argv[i] + " not recognized.")
             help(k)
+
+   
+    # 5 milisekunden.  
+    # 0.05189943313598633
+    print(time() - st)
 else:
     print("Please provide some of the functions below as arguments!")
     help(GridInterface)

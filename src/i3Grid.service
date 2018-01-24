@@ -1,0 +1,9 @@
+
+[Service]
+ExecStart=/usr/local/bin/i3GridController
+User=juli
+
+
+[Install]
+WantedBy=default.target
+
