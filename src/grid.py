@@ -22,12 +22,31 @@ class Grid:
         self.cols = 3
         self.rows = 3
         self.reloadWorkspaces()
+
        
     def reloadWorkspaces(self):
         workspaces = str(Popen(
             ["i3-msg", "-t", "get_workspaces"], 
             stdout = PIPE).communicate()[0])
         self.workspaces = json.loads(workspaces[2:-3])
+
+        self.wsmat = np.zeros([self.rows, self.cols, 2]).astype("int").astype("str")
+        for ws in self.workspaces:
+            i = ws["num"]
+            r, c = self._idToPos(i-1)
+
+            # in case the dimensions do not match with the default dimensions,
+            # update
+            if r >= self.wsmat.shape[0] or c >= self.wsmat.shape[1]:
+                a = self.wsmat;
+                self.wsmat = np.zeros([max(r+1, self.wsmat.shape[0]), max(c+1, self.wsmat.shape[1]), 2]).astype("int").astype("str")
+                self.wsmat[:a.shape[0], :a.shape[1]] = a
+                self.rows , self.cols, _ = self.wsmat.shape
+
+            self.wsmat[r, c] = int(ws["num"]), ws["name"]
+
+        
+        
     
     def _switchWs(self, r1, c1, r2, c2):
         """
@@ -55,6 +74,7 @@ class Grid:
         val = self._getWorkspaceByPredicate(lambda xs : xs["num"] == i)
         if val.shape[0]:
             return val[0]
+        return np.empty([0,0])
 
     def _getWorkspace(self, i):
         """
@@ -62,22 +82,45 @@ class Grid:
         :i:         identifier of the workspace.
         If that workspace does not exist yet, create new workspace.
         """
-        val = self._getWorkspaceByPredicate(lambda xs : xs["num"] == i)
+        val = self._getExistingWorkspace(i)
         if val.shape[0]:
-            return val[0]
+            return val
         if i < len(self.titles):
             return i, self.titles[i]
         return i, i
 
+    def _getNextExistingWorkspace(self, cr, cc, dr, dc):
 
-    def _switchWsParam(self, dr, dc):
+        rows, cols, _ = self.wsmat.shape
+        for i in range(1, max(self.wsmat.shape[0] * (dr != 0), (dc != 0) * self.wsmat.shape[1])):
+            r = int((cr + dr * i) % rows)
+            c = int((cc + dc * i) %  cols)
+            if r < 0: r+= rows
+            if c < 0: c+= cols
+            cv = self.wsmat[r,c]
+            if int(cv[0]):
+
+                return r, c, cv[0], cv[1]
+
+
+    def _changeExistingWsParam(self, dr, dc):
+        cw = self._getCurrentWorkspace()
+        if (cw.shape[0]):
+            ident, _ = cw[0]
+            cr, cc = coords = self._idToPos(int(ident)-1)
+            
+            result = self._getNextExistingWorkspace(cr, cc, dr, dc)
+            print("next ex", result)
+            if result: 
+                return result
+
+
+    def _changeWsParam(self, dr, dc):
 
         cw = self._getCurrentWorkspace()
         if (cw.shape[0]):
             ident, _ = cw[0]
             cr, cc = coords = self._idToPos(int(ident)-1)
-
-
 
             newc = cc + dc
             newr = cr + dr 
@@ -91,7 +134,6 @@ class Grid:
             if newrPos < 0:
                 newrPos += self.rows; 
 
-
             print("  + ", dr, dc)
             print("------------")
 
@@ -99,7 +141,7 @@ class Grid:
             name = self._getWorkspace(nid)[1]
             print("to  ", newrPos, newcPos, nid, name)
             
-            return newcPos, newrPos, nid, name 
+            return newrPos, newcPos, nid, name 
 
 
     def moveWindowBy(self, dr, dc):
@@ -109,9 +151,9 @@ class Grid:
         :dc:        c_new = c_old + dc
         """
 
-        ret = self._switchWsParam(dr, dc)
+        ret = self._changeWsParam(dr, dc)
         if ret:
-            c, r, ident, name = ret
+            r, c, ident, name = ret
             print(c, r, ident, "name=" , name)
             self._moveWindowTo(name)
 
@@ -121,11 +163,38 @@ class Grid:
         :dr:        r_new = r_old + dr
         :dc:        c_new = c_old + dc
         """
-        ret = self._switchWsParam(dr, dc)
+        ret = self._changeWsParam(dr, dc)
         if ret:
-            c, r, ident, name = ret
+            r, c, ident, name = ret
             print(c, r, ident, "name=" , name)
             self._moveWorkspaceTo(name)
+    
+    def moveWindowIntoDir(self, dr, dc):
+        """
+        moves currently active window to new (already existing) workspace 
+        in the direction of dr, dc. 
+        :dr:        r_new = r_old + \lambda dr
+        :dc:        c_new = c_old + \lambda dc
+        """
+
+        ret = self._changeExistingWsParam(dr, dc)
+        if ret:
+            r, c, ident, name = ret
+            print(c, r, ident, "name=" , name)
+            self._moveWindowTo(name)
+    def moveWorkspaceIntoDir(self, dr, dc):
+        """
+        moves currently active workspace to new (already existing) workspace 
+        in the direction of dr, dc. 
+        :dr:        r_new = r_old + \lambda dr
+        :dc:        c_new = c_old + \lambda dc
+        """
+        ret = self._changeExistingWsParam(dr, dc)
+        if ret:
+            r, c, ident, name = ret
+            print(c, r, ident, "name=" , name)
+            self._moveWorkspaceTo(name)
+
 
     def _moveWindowTo(self, i):
         """
@@ -202,10 +271,15 @@ class GridInterface:
     def __init__(self):
         #XXX: implement the link to the view
         self.gridController = Grid()
+
+
     ##
-    # Move window
+    # Movements along the grid, possibly spawning a new workpace in case it
+    # does not exist already. Movements are always performed one step at a
+    # time. 
     ## 
 
+    # window
     def moveWindowUp(self):
         self.gridController.moveWindowBy(-1, 0)
     def moveWindowDown(self):
@@ -216,9 +290,7 @@ class GridInterface:
         self.gridController.moveWindowBy(0, 1)
 
 
-    ##
-    # Move workspace 
-    ## 
+    # workspace 
     def moveWorkspaceUp(self):
         self.gridController.moveWorkspaceBy(-1, 0)
     def moveWorkspaceDown(self):
@@ -227,7 +299,42 @@ class GridInterface:
         self.gridController.moveWorkspaceBy(0, -1)
     def moveWorkspaceRight(self):
         self.gridController.moveWorkspaceBy(0, 1)
+    
+    ##
+    # Movements only taking into consideration those workspaces that do already
+    # exist.
+    ## 
 
+    # window
+    def moveWindowExistingUp(self):
+        self.gridController.moveWindowIntoDir(-1, 0)
+    def moveWindowExistingDown(self):
+        self.gridController.moveWindowIntoDir(1, 0)
+    def moveWindowExistingLeft(self):
+        self.gridController.moveWindowIntoDir(0, -1)
+    def moveWindowExistingRight(self):
+        self.gridController.moveWindowIntoDir(0, 1)
+
+    # workspace 
+    def moveWorkspaceExistingUp(self):
+        self.gridController.moveWorkspaceIntoDir(-1, 0)
+    def moveWorkspaceExistingDown(self):
+        self.gridController.moveWorkspaceIntoDir(1, 0)
+    def moveWorkspaceExistingLeft(self):
+        self.gridController.moveWorkspaceIntoDir(0, -1)
+    def moveWorkspaceExistingRight(self):
+        self.gridController.moveWorkspaceIntoDir(0, 1)
+
+
+    ##
+    # Movements expanding the grid if necessary
+    ## 
+
+    #XXX: tbd
+
+    ##
+    # Makes no sense to access this function via api, just for the controller.
+    ##
     def reloadWorkspaces(self):
         self.gridController.reloadWorkspaces()
 

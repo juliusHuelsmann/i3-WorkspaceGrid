@@ -46,13 +46,27 @@ class Controller(pyinotify.ProcessEvent):
             if (message=="exit"):
                 exit()
 
-            message = "self.worker." + message + "()"
-            self.worker.reloadWorkspaces()
-            try:
-                print(time.time() , "Executing message" + message + "!")
-                exec(message)
-            except:    
-                print("error, did not understand " + message + " as command.")
+            mgs = message.split('\n')
+            ts = time.time()
+            for message  in mgs:
+
+                #
+                tc = time.time() #< this is for being able to process keydown
+                                 #  commands from the user 
+                if tc - ts > .5:
+                    print("interrupted execution due to timeout.")
+                    break
+        
+                message = "self.worker." + message + "()"
+                self.worker.reloadWorkspaces()
+                try:
+                    print(time.time() , "Executing message" + message + "!")
+                    exec(message)
+                except Exception as e:    
+                    print("error, did not understand " + message + " as command  ")
+                    print("or encountered error in the library:")
+                    print(e)
+
 
 
 
