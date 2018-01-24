@@ -1,15 +1,25 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-from time import time
-st = time()
+# This controller is somewhat outdated, lauching a python script each time an
+# operation is to be performed introduces latency.
+# 
+# Therefore the interface controller.py offers the possibility to communicate
+# via named pipes which reduces the overhead to \approx 0. 
+# 
+# This file can be used for testing a not-running version manually.
+
+# USAGE:                                        Provide operation as parameter.
+
+
+
+
 import sys
 import os
 
-currPath = os.path.dirname(os.path.abspath(__file__)) # /a/b/c/d/e
+currPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(currPath)
 
 from grid import GridInterface 
-import os
 
 
 if len(sys.argv) > 1:
@@ -25,9 +35,6 @@ if len(sys.argv) > 1:
             help(k)
 
    
-    # 5 milisekunden.  
-    # 0.05189943313598633
-    print(time() - st)
 else:
     print("Please provide some of the functions below as arguments!")
     help(GridInterface)

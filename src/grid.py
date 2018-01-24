@@ -44,7 +44,7 @@ class Grid:
                 self.rows , self.cols, _ = self.wsmat.shape
 
             self.wsmat[r, c] = int(ws["num"]), ws["name"]
-
+        #self.vw.load(self.wsmat)
         
         
     
