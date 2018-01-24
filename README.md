@@ -5,10 +5,10 @@ a customizable (logical) grid.
 
 It can be run from the command line or bound to hotkeys through the i3 
 configuration file. 
-Forked from (https://github.com/lukeshimanuki/i3-grid)[Luke Shimanuki].
+Forked from [Luke Shimanuki](https://github.com/lukeshimanuki/i3-grid).
 
 
-# interfaces 
+# 1 Interfaces 
 There recommended two possible ways to use this extension is via communication 
 with the current `controller.py` script. This can be done
 by simply appending  
@@ -23,20 +23,10 @@ changing the PATH). Communication with this controller is achieved via the
 bindsym $mod+Ctrl+Mod1+h exec --no-startup-id i3Grid moveWorkspaceLeft
 ```
 
-```
-bindsym $mod+Ctrl+Mod1+l exec --no-startup-id i3Grid moveWorkspaceRight
-bindsym $mod+Ctrl+Mod1+j exec --no-startup-id i3Grid moveWorkspaceDown
-bindsym $mod+Ctrl+Mod1+k exec --no-startup-id i3Grid moveWorkspaceUp
-
-bindsym $mod+Ctrl+h exec --no-startup-id i3Grid moveWorkspaceExistingLeft
-bindsym $mod+Ctrl+l exec --no-startup-id i3Grid moveWorkspaceExistingRight
-bindsym $mod+Ctrl+j exec --no-startup-id i3Grid moveWorkspaceExistingDown
-bindsym $mod+Ctrl+k exec --no-startup-id i3Grid moveWorkspaceExistingUp
-```
 
 
-
-### available
+# 2 Features
+### Available
 - moveWindow{Left, Right, Up, Down} 
     - move currently active window {Left, Right, Up, Down} a workspace.
 - moveWorkspace{Left, Right, Up, Down}
@@ -73,8 +63,9 @@ bindsym $mod+Ctrl+k exec --no-startup-id i3Grid moveWorkspaceExistingUp
   - display the current location and the currently active workspaces 
 
 
-# Setup
+# 3 Setup
 
+## 3a) Setup scripts
 For setting up simply have a look at the `setup.sh` script, which does only
 create symbolic links for finding the scripts in the `bash` folder if executed
 as root.
@@ -103,7 +94,7 @@ Clone
 # ~/.config/i3/scripts/[NAME]
 ```
 
-# Configuration
+## 3b Configuration
 Configuration for workspace switch
 ```
 bindsym $mod+Ctrl+Mod1+h exec --no-startup-id i3Grid moveWorkspaceLeft
