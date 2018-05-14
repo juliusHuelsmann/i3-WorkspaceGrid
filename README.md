@@ -66,6 +66,12 @@ bindsym $mod+Ctrl+Mod1+h exec --no-startup-id i3Grid moveWorkspaceLeft
 # 3 Setup
 
 ## 3a) Setup scripts
+
+### Step 1
+Check out where your python3 is located. E.g. exchange the paths in the python
+scripts.
+
+### Step 2)
 For setting up simply have a look at the `setup.sh` script, which does only
 create symbolic links for finding the scripts in the `bash` folder if executed
 as root.
@@ -94,7 +100,21 @@ Clone
 # ~/.config/i3/scripts/[NAME]
 ```
 
+### Check if the script is working
+Launch 
+`starti3Grid.sh`. 
+If keybindings are set up, this script shows debug output. Try 'em out or quit
+via Ctrl+c.
+
+
+
 ## 3b Configuration
+For launching the execution daemon, add 
+```
+exec_always --no-startup-id starti3Grid.sh 
+```
+to your i3config.
+
 Configuration for workspace switch
 ```
 bindsym $mod+Ctrl+Mod1+h exec --no-startup-id i3Grid moveWorkspaceLeft

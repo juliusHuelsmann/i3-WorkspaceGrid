@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 # The up-to-date interface to i3-grid. This script is to be launched on start
 # of i3. Make sure that there is only one controller running at a time. 
