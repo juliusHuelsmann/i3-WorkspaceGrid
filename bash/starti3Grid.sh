@@ -1,2 +1,2 @@
 echo "exit" >> "/tmp/mypipe" 
-i3GridController
+python3 $(which i3GridController)
