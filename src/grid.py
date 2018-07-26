@@ -18,8 +18,8 @@ class Grid:
         #XXX: this sucks.
         #self.titles = np.array(["0", "1git", "2vim", "3ide", "4pdf", 
         #    5, 6, "7qt", "8fire", "9chat"])
-        self.titles = np.array(["0", "1o", "2w1", "3w2", "4i", 
-            "5i1", "6i2", "7q", "8f", "9c"])
+        self.titles = np.array(["0", "1o", "2w1", "3w2", "4s", 
+            "5s1", "6s2", "7q", "8f", "9c"])
 
         self.cols = 3
         self.rows = 3
