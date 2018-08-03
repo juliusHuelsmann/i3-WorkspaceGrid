@@ -16,6 +16,8 @@ class Grid:
         #self.titles = reload the titles
 
         #XXX: this sucks.
+        #self.titles = np.array(["0", "1git", "2vim", "3ide", "4pdf", 
+        #    5, 6, "7qt", "8fire", "9chat"])
         self.titles = np.array(["0", "1o", "2w1", "3w2", "4s", 
             "5s1", "6s2", "7q", "8f", "9c"])
 
@@ -28,12 +30,21 @@ class Grid:
         workspaces = str(Popen(
             ["i3-msg", "-t", "get_workspaces"], 
             stdout = PIPE).communicate()[0])
-        self.workspaces = json.loads(workspaces[2:-3])
+        #workspaces = workspaces.replace("\\", "\\\\")
+        #workspaces = workspaces.encode("ascii")
+        workspaces = workspaces.replace("\\", "\\\\")
+        self.workspaces = json.loads(workspaces[2:-4])
+        print(len(self.workspaces))
 
         self.wsmat = np.zeros([self.rows, self.cols, 2]).astype("int").astype("str")
         for ws in self.workspaces:
             i = ws["num"]
+            print(ws)
+            print("name alt", ws["name"])
+            ws["name"] = ws["name"].replace("\\\\", "\\").encode("ascii")
+            print("name neu", ws["name"])
             r, c = self._idToPos(i-1)
+
 
             # in case the dimensions do not match with the default dimensions,
             # update
@@ -99,8 +110,9 @@ class Grid:
             if c < 0: c+= cols
             cv = self.wsmat[r,c]
             if int(cv[0]):
+                flunsch = cv[1]
 
-                return r, c, cv[0], cv[1]
+                return r, c, cv[0], flunsch
 
 
     def _changeExistingWsParam(self, dr, dc):
@@ -108,9 +120,8 @@ class Grid:
         if (cw.shape[0]):
             ident, _ = cw[0]
             cr, cc = coords = self._idToPos(int(ident)-1)
-            
+         
             result = self._getNextExistingWorkspace(cr, cc, dr, dc)
-            print("next ex", result)
             if result: 
                 return result
 
@@ -200,7 +211,7 @@ class Grid:
         """
         Moves widow to identifier
         """
-        Popen(["i3-msg", "move", "container", "to", "workspace", str(i)], 
+        Popen(["i3-msg", "move", "container", "to", "workspace", i.encode("ascii") ], 
                 stdout = PIPE).communicate()
         self._moveWorkspaceTo(i)
 
@@ -208,7 +219,8 @@ class Grid:
         """
         Moves widow to identifier
         """
-        Popen(["i3-msg", "workspace", str(i)], stdout = PIPE).communicate()
+        Popen(["i3-msg", "workspace",i],
+            stdout = PIPE).communicate()
 
     def _getCurrentWorkspace(self ):
         """
