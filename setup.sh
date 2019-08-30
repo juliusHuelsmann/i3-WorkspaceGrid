@@ -2,6 +2,7 @@
 set -e
 
 pip3 install pyinotify --user
+pip3 install numpy --user
 
 # create symbolic link to the controller, that is to be set up as a service 
 #echo "Removing old link to i3 grid controller (if it exists)"
